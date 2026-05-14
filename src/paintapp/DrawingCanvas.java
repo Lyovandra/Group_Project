@@ -4,6 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * The main drawing surface for the application.
+ * Manages the collection of shapes, handles mouse and keyboard input for drawing,
+ * and coordinates undo/redo operations through a CommandManager.
+ */
 public class DrawingCanvas extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
     private PaintShape[] shapes = new PaintShape[1000];
     private int shapeCount = 0;
@@ -20,6 +25,9 @@ public class DrawingCanvas extends JPanel implements MouseListener, MouseMotionL
     private boolean resizing;
     private boolean moving;
 
+    /**
+     * Initializes the canvas with default settings and input mappings.
+     */
     public DrawingCanvas() {
         setBackground(Color.WHITE);
         setFocusable(true);
@@ -52,30 +60,51 @@ public class DrawingCanvas extends JPanel implements MouseListener, MouseMotionL
         });
     }
 
+    /**
+     * Sets the current active tool mode.
+     * @param toolMode the tool mode to activate
+     */
     public void setToolMode(ToolMode toolMode) {
         this.toolMode = toolMode;
         this.selectedShape = null;
         repaint();
     }
 
+    /**
+     * Sets the stroke color for new shapes.
+     * @param strokeColor the color for shape outlines
+     */
     public void setStrokeColor(Color strokeColor) {
         this.strokeColor = strokeColor;
     }
 
+    /**
+     * Sets the fill color for new shapes.
+     * @param fillColor the color for shape interiors
+     */
     public void setFillColor(Color fillColor) {
         this.fillColor = fillColor;
     }
 
+    /**
+     * Reverts the last executed command.
+     */
     public void undo() {
         commandManager.undo(this);
         repaint();
     }
 
+    /**
+     * Re-executes the last undone command.
+     */
     public void redo() {
         commandManager.redo(this);
         repaint();
     }
 
+    /**
+     * Clears all shapes from the canvas (undoable).
+     */
     public void clearAll() {
         commandManager.execute(new ShapeCommand() {
             private PaintShape[] backup;
@@ -103,6 +132,9 @@ public class DrawingCanvas extends JPanel implements MouseListener, MouseMotionL
         repaint();
     }
 
+    /**
+     * Deletes the currently selected shape (undoable).
+     */
     public void deleteSelected() {
         if (selectedShape == null) return;
         commandManager.execute(new DeleteShapeCommand(selectedShape), this);
